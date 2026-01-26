@@ -54,16 +54,16 @@ CREATE TABLE responsibilities (
 );
 
 -- CITATIONS dictionary
-CREATE TABLE citations (
+/*CREATE TABLE citations (
   id INT AUTO_INCREMENT PRIMARY KEY,
   key_code VARCHAR(50) NOT NULL UNIQUE, -- напр. CIT-001
   quote_text TEXT NOT NULL,
   source_text VARCHAR(255) NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+);*/
 
 -- Who cited what (статистика)
-CREATE TABLE citation_uses (
+/*CREATE TABLE citation_uses (
   id INT AUTO_INCREMENT PRIMARY KEY,
   citation_id INT NOT NULL,
   user_id INT NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE citation_uses (
   used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (citation_id) REFERENCES citations(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+);*/
 
 -- QR tokens for checklists (simple)
 CREATE TABLE qr_tokens (
@@ -136,3 +136,12 @@ CREATE TABLE IF NOT EXISTS student_qr (
 
 ALTER TABLE students
   ADD COLUMN gpa DECIMAL(3,2) NULL;
+
+ALTER TABLE grad_process
+ADD agree_personal_data TINYINT DEFAULT 0,
+ADD agree_public_name TINYINT DEFAULT 0,
+ADD agree_photos TINYINT DEFAULT 0,
+ADD declare_correct TINYINT DEFAULT 0;
+
+ALTER TABLE students ADD COLUMN photo VARCHAR(255) NULL;
+

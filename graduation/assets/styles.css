@@ -12,18 +12,13 @@ body{margin:0;background:#f6f7fb;color:#111;}
 .stage-2{background:#f7ddff;border-color:#e7a6ff;}   /* лилаво */
 .stage-3{background:#dcf8e8;border-color:#9ee8c0;}   /* зелено */
 
-.cite-chip{
-  display:inline-flex; align-items:center; gap:6px;
-  padding:2px 8px; border-radius:999px;
-  border:1px solid #cbd5e1; background:#f8fafc;
-  font-style:normal;
-}
-.cite-chip::before{
-  content:"cite"; font-size:10px; text-transform:uppercase;
-  opacity:.65;
-}
 .small{font-size:12px;color:#555;}
 .btn{display:inline-block;padding:8px 12px;border-radius:10px;border:1px solid #ddd;background:#fff;cursor:pointer;text-decoration:none;color:#111;}
 .btn.primary{background:#111;color:#fff;border-color:#111;}
-input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;}
+input:not([type="checkbox"]),select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+input[type="checkbox"]{
+  width:auto;
+  padding:0;
+  border-radius:0;
+}

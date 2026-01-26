@@ -83,7 +83,6 @@ if(!$row){ exit('Няма студентски профил.'); }
     </p>
     <p>
       <a class="btn primary" href="/graduation/student/register.php">Заявка за дипломиране</a>
-      <a class="btn" href="/graduation/student/citations.php">Цитати</a>
       <a class="btn" href="/graduation/student/guests.php">Билети за церемония</a>
     </p>
   </div>

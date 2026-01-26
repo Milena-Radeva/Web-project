@@ -36,7 +36,6 @@ $usedTickets  = db()->query("SELECT COUNT(*) FROM guest_tickets WHERE used_at IS
   <b>Администрация</b>
   <a class="btn" href="/graduation/admin/import_export.php">Импорт/Експорт</a>
   <a class="btn" href="/graduation/admin/responsibilities.php">Отговорници</a>
-  <a class="btn" href="/graduation/admin/citations.php">Цитати</a>
   <a class="btn" href="/graduation/admin/reports.php">Отчети</a>
   <a class="btn primary" href="/graduation/admin/scanner.php">Скенер (вход)</a>
 

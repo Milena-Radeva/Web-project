@@ -4,18 +4,19 @@ require_once __DIR__.'/../inc/helpers.php';
 require_role(['admin','superadmin']);
 
 $id = (int)($_GET['id'] ?? 0);
-if(!$id) exit('Missing id');
+if(!$id) { exit('Missing id'); }
 
 // Данни за студента + процес
 $stmt = db()->prepare("
   SELECT
     s.id AS student_id,
-    s.faculty_no, s.degree, s.program_name, s.group_code, s.phone,
+    s.faculty_no, s.degree, s.program_name, s.group_code, s.phone, s.photo,
     u.full_name, u.email,
     gp.stage, gp.registered_at, gp.confirmed_at, gp.ceremony_checked_in_at, gp.diploma_received_at,
     gp.gown_requested, gp.gown_taken, gp.gown_returned,
-    gp.is_honors, gp.reward_badge, gp.reward_calendar,
-    gp.notes
+    gp.is_honors,
+    gp.notes,
+    gp.agree_personal_data, gp.agree_public_name, gp.agree_photos, gp.declare_correct
   FROM students s
   JOIN users u ON u.id=s.user_id
   JOIN grad_process gp ON gp.student_id=s.id
@@ -23,31 +24,18 @@ $stmt = db()->prepare("
 ");
 $stmt->execute([$id]);
 $st = $stmt->fetch();
-if(!$st) exit('Student not found');
 
-// Какви декларации (цитати) е използвал този студент (по желание)
-$uses = db()->prepare("
-  SELECT c.key_code, c.quote_text, COUNT(*) AS cnt
-  FROM citation_uses cu
-  JOIN citations c ON c.id=cu.citation_id
-  JOIN users uu ON uu.id=cu.user_id
-  WHERE uu.id = (SELECT user_id FROM students WHERE id=?)
-  GROUP BY c.id
-  ORDER BY cnt DESC, c.key_code
-");
-$uses->execute([$id]);
-$cit_used = $uses->fetchAll();
-
-// Безопасно рендериране на notes:
-// - позволяваме само <cite> и <br> (и текст)
-// - махаме всички други тагове
-$notes = $st['notes'] ?? '';
-$notes_safe = strip_tags($notes, '<cite><br>');
+if(!$st) { exit('Student not found'); }
 ?>
-<!doctype html><html lang="bg"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="/graduation/assets/styles.css">
-<title>Заявление – <?=h($st['full_name'])?></title></head><body>
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/graduation/assets/styles.css">
+  <title>Заявление – <?=h($st['full_name'])?></title>
+</head>
+<body>
 
 <div class="topbar">
   <b>Заявление</b>
@@ -72,42 +60,81 @@ $notes_safe = strip_tags($notes, '<cite><br>');
   <div class="card">
     <h3>Заявление (текст от студента)</h3>
 
-    <?php if(!$notes_safe): ?>
-      <div class="small">Няма въведена бележка.</div>
+    <?php if(empty($st['notes'])): ?>
+      <div class="small">Няма въведен текст.</div>
     <?php else: ?>
-      <!-- показваме го като HTML, за да се визуализират <cite> чиповете -->
       <div style="white-space:pre-wrap; line-height:1.5">
-        <?= $notes_safe ?>
+        <?= h($st['notes']) ?>
       </div>
     <?php endif; ?>
 
     <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
 
+    <h3>Снимка за диплома</h3>
+    <?php if(!empty($st['photo'])): ?>
+      <img
+        src="/graduation/uploads/<?=h($st['photo'])?>"
+        alt="Снимка за диплома"
+        style="max-width:240px;border-radius:12px;border:1px solid #ddd;"
+      >
+    <?php else: ?>
+      <div class="small">Няма качена снимка.</div>
+    <?php endif; ?>
+
+    <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
+    <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
+
+<h3>Декларации / отметки</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Декларация</th>
+      <th>Статус</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Заявена тога</td>
+      <td><?= $st['gown_requested'] ? '✅' : '—' ?></td>
+    </tr>
+    <tr>
+      <td>Съгласие за обработка на лични данни</td>
+      <td><?= $st['agree_personal_data'] ? '✅' : '—' ?></td>
+    </tr>
+    <tr>
+      <td>Съгласие за публикуване на име в списъци</td>
+      <td><?= $st['agree_public_name'] ? '✅' : '—' ?></td>
+    </tr>
+    <tr>
+      <td>Съгласие за снимки и видео</td>
+      <td><?= $st['agree_photos'] ? '✅' : '—' ?></td>
+    </tr>
+    <tr>
+      <td>Декларация за коректност на данните</td>
+      <td><?= $st['declare_correct'] ? '✅' : '—' ?></td>
+    </tr>
+  </tbody>
+</table>
+
+
     <div class="small">
       Тога заявена: <b><?= $st['gown_requested'] ? 'Да' : 'Не' ?></b> •
       Взел тога: <b><?= $st['gown_taken'] ? 'Да' : 'Не' ?></b> •
       Върнал тога: <b><?= $st['gown_returned'] ? 'Да' : 'Не' ?></b><br>
-      Отличник: <b><?= $st['is_honors'] ? 'Да' : 'Не' ?></b> (значка: <?= $st['reward_badge']?'Да':'Не' ?>, календар: <?= $st['reward_calendar']?'Да':'Не' ?>)
+      Отличник: <b><?= $st['is_honors'] ? 'Да' : 'Не' ?></b>
+    </div>
+
+    <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
+
+    <div class="small">
+      Регистрация: <b><?=h($st['registered_at'])?></b><br>
+      Потвърден: <b><?=h($st['confirmed_at'] ?? '—')?></b><br>
+      Check-in: <b><?=h($st['ceremony_checked_in_at'] ?? '—')?></b><br>
+      Получена диплома: <b><?=h($st['diploma_received_at'] ?? '—')?></b>
     </div>
   </div>
 
-  <?php if($cit_used): ?>
-    <div class="card">
-      <h3>Използвани декларации (цитати)</h3>
-      <table class="table">
-        <thead><tr><th>Код</th><th>Текст</th><th>Брой</th></tr></thead>
-        <tbody>
-        <?php foreach($cit_used as $c): ?>
-          <tr>
-            <td><cite class="cite-chip" data-cite-id="<?=h($c['key_code'])?>"><?=h($c['key_code'])?></cite></td>
-            <td><?=h($c['quote_text'])?></td>
-            <td><?=h($c['cnt'])?></td>
-          </tr>
-        <?php endforeach; ?>
-        </tbody>
-      </table>
-    </div>
-  <?php endif; ?>
-
 </div>
-</body></html>
+
+</body>
+</html>
