@@ -106,3 +106,33 @@ INSERT INTO responsibilities(type, person_name, email, phone) VALUES
 INSERT INTO citations(key_code, quote_text, source_text) VALUES
 ('CIT-001','Образованието е най-мощното оръжие, което можеш да използваш, за да промениш света.','(приписвано на Н. Мандела)'),
 ('CIT-002','Науката е организирано знание. Мъдростта е организиран живот.','У. Дюрант');
+
+
+CREATE TABLE IF NOT EXISTS guest_tickets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT NOT NULL,
+  token VARCHAR(64) NOT NULL UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  used_at TIMESTAMP NULL,
+  used_by_user_id INT NULL,
+  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+  FOREIGN KEY (used_by_user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- лимит билети на студент (по подразбиране 2)
+ALTER TABLE grad_process
+  ADD COLUMN guests_allowed INT NOT NULL DEFAULT 2;
+
+CREATE TABLE IF NOT EXISTS student_qr (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT NOT NULL UNIQUE,
+  token VARCHAR(64) NOT NULL UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  used_at TIMESTAMP NULL,
+  used_by_user_id INT NULL,
+  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+  FOREIGN KEY (used_by_user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+ALTER TABLE students
+  ADD COLUMN gpa DECIMAL(3,2) NULL;

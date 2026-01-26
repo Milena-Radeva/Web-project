@@ -15,7 +15,8 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   }
   header("Location: /graduation/admin/responsibilities.php"); exit;
 }
-$rows = $pdo->query("SELECT * FROM responsibilities WHERE active=1 ORDER BY type, person_name")->fetchAll();
+$rows = $pdo->query("SELECT * FROM responsibilities ORDER BY type, active DESC, person_name")->fetchAll();
+
 ?>
 <!doctype html><html lang="bg"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -43,7 +44,7 @@ $rows = $pdo->query("SELECT * FROM responsibilities WHERE active=1 ORDER BY type
   <div class="card">
     <h3>Списък</h3>
     <table class="table">
-      <thead><tr><th>Тип</th><th>Име</th><th>Email</th><th>Телефон</th></tr></thead>
+      <thead><tr><th>Тип</th><th>Име</th><th>Email</th><th>Телефон</th><th>Статус</th><th>Действие</th></tr></thead>
       <tbody>
         <?php foreach($rows as $r): ?>
           <tr>
@@ -51,6 +52,26 @@ $rows = $pdo->query("SELECT * FROM responsibilities WHERE active=1 ORDER BY type
             <td><?=h($r['person_name'])?></td>
             <td><?=h($r['email'] ?? '')?></td>
             <td><?=h($r['phone'] ?? '')?></td>
+            <td>
+              <?= $r['active'] ? '<span style="color:green">Активен</span>' : '<span style="color:#999">Отписан</span>' ?>
+            </td>
+
+            <td>
+              <form method="post" action="/graduation/api/toggle_responsibility.php">
+                <input type="hidden" name="id" value="<?=h($r['id'])?>">
+                <?php if($r['active']): ?>
+                  <button class="btn" style="background:#fee;border-color:#f99"
+                    onclick="return confirm('Сигурен ли си, че искаш да отпишеш този отговорник?')">
+                    Отпиши
+                  </button>
+                <?php else: ?>
+                  <button class="btn" style="background:#e6fffa;border-color:#6ee7b7">
+                    Възстанови
+                  </button>
+                <?php endif; ?>
+              </form>
+            </td>
+
           </tr>
         <?php endforeach; ?>
       </tbody>

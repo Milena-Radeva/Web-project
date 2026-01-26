@@ -41,17 +41,18 @@ switch($action){
     $pdo->prepare("UPDATE grad_process SET gown_returned=1 WHERE student_id=?")->execute([$student_id]);
     break;
 
-  case 'toggle_honors':
-    $pdo->prepare("UPDATE grad_process SET is_honors = 1 - is_honors WHERE student_id=?")->execute([$student_id]);
-    break;
+  case 'set_honors':
+  $pdo->prepare("UPDATE grad_process SET is_honors = 1 WHERE student_id=?")
+      ->execute([$student_id]);
+  break;
 
-  case 'toggle_badge':
+  /*case 'toggle_badge':
     $pdo->prepare("UPDATE grad_process SET reward_badge = 1 - reward_badge WHERE student_id=?")->execute([$student_id]);
     break;
 
   case 'toggle_calendar':
     $pdo->prepare("UPDATE grad_process SET reward_calendar = 1 - reward_calendar WHERE student_id=?")->execute([$student_id]);
-    break;
+    break;*/
 
   default:
     exit('Unknown action');
