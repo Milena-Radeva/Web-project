@@ -103,9 +103,9 @@ INSERT INTO responsibilities(type, person_name, email, phone) VALUES
 ('diplomas','Гл. специалист Димитрова','diplomas@uni.test','0888000003');
 
 -- Seed citations
-INSERT INTO citations(key_code, quote_text, source_text) VALUES
+/*INSERT INTO citations(key_code, quote_text, source_text) VALUES
 ('CIT-001','Образованието е най-мощното оръжие, което можеш да използваш, за да промениш света.','(приписвано на Н. Мандела)'),
-('CIT-002','Науката е организирано знание. Мъдростта е организиран живот.','У. Дюрант');
+('CIT-002','Науката е организирано знание. Мъдростта е организиран живот.','У. Дюрант');*/
 
 
 CREATE TABLE IF NOT EXISTS guest_tickets (
