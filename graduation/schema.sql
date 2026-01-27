@@ -145,3 +145,8 @@ ADD declare_correct TINYINT DEFAULT 0;
 
 ALTER TABLE students ADD COLUMN photo VARCHAR(255) NULL;
 
+UPDATE grad_process gp
+JOIN students s ON s.id = gp.student_id
+SET gp.is_honors = (s.gpa >= 5.50);
+
+
