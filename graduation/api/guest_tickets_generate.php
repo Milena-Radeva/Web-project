@@ -12,8 +12,8 @@ $stmt = db()->prepare("
   WHERE s.user_id=?
 ");
 $stmt->execute([$u['id']]);
-$info = $stmt->fetch();
-if(!$info) exit('No student');
+$st = $stmt->fetch();
+if(!$st) exit('No student');
 if(!$st || $st['stage'] < 1){
   http_response_code(403);
   exit('Заявлението не е потвърдено.');
