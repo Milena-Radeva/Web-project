@@ -25,8 +25,6 @@ $rows = db()->query("
 ")->fetchAll();
 $totalTickets = db()->query("SELECT COUNT(*) FROM guest_tickets")->fetchColumn();
 $usedTickets  = db()->query("SELECT COUNT(*) FROM guest_tickets WHERE used_at IS NOT NULL")->fetchColumn();
-
-
 ?>
 <!doctype html><html lang="bg"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,6 +36,9 @@ $usedTickets  = db()->query("SELECT COUNT(*) FROM guest_tickets WHERE used_at IS
   <a class="btn" href="/graduation/admin/responsibilities.php">Отговорници</a>
   <a class="btn" href="/graduation/admin/reports.php">Отчети</a>
   <a class="btn primary" href="/graduation/admin/scanner.php">Скенер (вход)</a>
+  <?php if (current_user()['role'] === 'superadmin'): ?>
+    <a class="btn" href="/graduation/admin/admins.php">Администратори</a>
+  <?php endif; ?>
 
   <span style="margin-left:auto"><?=h($u['full_name'])?></span>
   <a class="btn" href="/graduation/api/auth_logout.php">Изход</a>
@@ -52,7 +53,7 @@ $usedTickets  = db()->query("SELECT COUNT(*) FROM guest_tickets WHERE used_at IS
 </div>
 <div class="container">
   <div class="card">
-    <h2>Студенти (етапи с цветово кодиране)</h2>
+    <h2>Студенти</h2>
    <table class="table">
   <thead>
     <tr>

@@ -229,10 +229,10 @@ $incomplete = $pdo->query("
     <div class="row">
       <div>
         <b>Етапи</b><br>
-        <div class="small">Етап 0 (нови): <b><?=h($stageStats[0])?></b></div>
-        <div class="small">Етап 1 (потвърдени): <b><?=h($stageStats[1])?></b></div>
-        <div class="small">Етап 2 (на церемония): <b><?=h($stageStats[2])?></b></div>
-        <div class="small">Етап 3 (завършили): <b><?=h($stageStats[3])?></b></div>
+        <div class="small">Регистрирани: <b><?=h($stageStats[0])?></b></div>
+        <div class="small">Потвърдени: <b><?=h($stageStats[1])?></b></div>
+        <div class="small">На церемония: <b><?=h($stageStats[2])?></b></div>
+        <div class="small">Завършили: <b><?=h($stageStats[3])?></b></div>
       </div>
 
       <div>

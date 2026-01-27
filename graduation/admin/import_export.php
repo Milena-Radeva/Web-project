@@ -13,7 +13,6 @@ require_role(['admin','superadmin']);
 <div class="container">
   <div class="card">
     <h3>Импорт студенти (CSV)</h3>
-    <div class="small">Колони: email,full_name,faculty_no,degree,program_name,group_code,phone</div>
     <form method="post" action="/graduation/api/import_students.php" enctype="multipart/form-data">
       <input type="file" name="csv" accept=".csv" required>
       <p><button class="btn primary">Импорт</button></p>
@@ -24,7 +23,6 @@ require_role(['admin','superadmin']);
     <h3>Експорт</h3>
     <p>
       <a class="btn primary" href="/graduation/admin/reports.php?export=students">Експорт студенти CSV</a>
-      <a class="btn" href="/graduation/admin/reports.php?export=stats">Експорт статистика CSV</a>
     </p>
   </div>
 </div>

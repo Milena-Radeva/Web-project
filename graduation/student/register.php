@@ -9,7 +9,7 @@ $s->execute([$u['id']]);
 $st = $s->fetch();
 
 if($_SERVER['REQUEST_METHOD']==='POST'){
-  $photoName = null;
+  /*$photoName = null;
 
   if(isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK){
     $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
@@ -23,7 +23,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     // записваме снимката в таблицата students
     db()->prepare("UPDATE students SET photo=? WHERE id=?")
        ->execute([$photoName, $st['id']]);
-  }
+  }*/
 
   $notes = $_POST['notes'] ?? '';
 $gown_requested      = isset($_POST['gown_requested']) ? 1 : 0;
@@ -70,11 +70,11 @@ $declare_correct     = isset($_POST['declare_correct']) ? 1 : 0;
     <form method="post" enctype="multipart/form-data">
       <label>Заявление за допускане до церемония за дипломиране</label>
       <textarea name="notes" rows="6"><?=h($st['notes'] ?? '')?></textarea>
-      <div style="margin:12px 0;">
+      <!---<div style="margin:12px 0;">
         <label>Снимка за диплома (JPG/PNG)</label>
         <input type="file" name="photo" accept="image/*">
         <div class="small">Препоръчителен размер: 3x4 cm, бял фон</div>
-      </div>
+      </div>--->
       <div style="margin:12px 0;">
         <label style="display:flex; align-items:center; gap:8px;">
           <input type="checkbox" name="gown_requested" value="1">

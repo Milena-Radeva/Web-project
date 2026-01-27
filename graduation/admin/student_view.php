@@ -42,20 +42,43 @@ if(!$st) { exit('Student not found'); }
   <a class="btn" href="/graduation/admin/dashboard.php">Назад</a>
 </div>
 
-<div class="container">
+<div class="card" style="display:flex; gap:20px; align-items:center;">
 
-  <div class="card">
-    <h2><?=h($st['full_name'])?></h2>
-    <div class="badge <?=h(stage_class((int)$st['stage']))?>">
+  <!-- Снимка -->
+  <div style="flex:0 0 140px; text-align:center;">
+    <?php if(!empty($st['photo'])): ?>
+      <img src="/graduation/uploads/<?=h($st['photo'])?>"
+           alt="Снимка за диплома"
+           style="width:120px;height:160px;object-fit:cover;
+                  border-radius:12px;border:1px solid #ddd;">
+    <?php else: ?>
+      <div style="width:120px;height:160px;
+                  display:flex;align-items:center;justify-content:center;
+                  border:1px dashed #ccc;border-radius:12px;
+                  color:#999;font-size:13px;">
+        Няма снимка
+      </div>
+    <?php endif; ?>
+  </div>
+
+  <!-- Информация -->
+  <div style="flex:1;">
+    <h2 style="margin:0 0 6px 0;"><?=h($st['full_name'])?></h2>
+
+    <div class="badge <?=h(stage_class((int)$st['stage']))?>" style="margin-bottom:8px;">
       Етап: <?=h(stage_label((int)$st['stage']))?>
     </div>
 
-    <p class="small" style="margin-top:10px">
-      Email: <b><?=h($st['email'])?></b> • ФН: <b><?=h($st['faculty_no'])?></b><br>
-      Степен: <b><?=h($st['degree'])?></b> • Програма: <b><?=h($st['program_name'])?></b> • Група: <b><?=h($st['group_code'])?></b><br>
+    <p class="small">
+      Email: <b><?=h($st['email'])?></b> <br> ФН: <b><?=h($st['faculty_no'])?></b><br>
+      Степен: <b><?=h($st['degree'])?></b><br>
+      Програма: <b><?=h($st['program_name'])?></b><br>
+      Група: <b><?=h($st['group_code'])?></b><br>
       Телефон: <b><?=h($st['phone'] ?? '')?></b>
     </p>
   </div>
+
+</div>
 
   <div class="card">
     <h3>Заявление (текст от студента)</h3>
@@ -70,58 +93,49 @@ if(!$st) { exit('Student not found'); }
 
     <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
 
-    <h3>Снимка за диплома</h3>
-    <?php if(!empty($st['photo'])): ?>
-      <img
-        src="/graduation/uploads/<?=h($st['photo'])?>"
-        alt="Снимка за диплома"
-        style="max-width:240px;border-radius:12px;border:1px solid #ddd;"
-      >
-    <?php else: ?>
-      <div class="small">Няма качена снимка.</div>
-    <?php endif; ?>
-
-    <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
-    <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
-
-<h3>Декларации / отметки</h3>
-<table class="table">
-  <thead>
-    <tr>
-      <th>Декларация</th>
-      <th>Статус</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Заявена тога</td>
-      <td><?= $st['gown_requested'] ? '✅' : '—' ?></td>
-    </tr>
-    <tr>
-      <td>Съгласие за обработка на лични данни</td>
-      <td><?= $st['agree_personal_data'] ? '✅' : '—' ?></td>
-    </tr>
-    <tr>
-      <td>Съгласие за публикуване на име в списъци</td>
-      <td><?= $st['agree_public_name'] ? '✅' : '—' ?></td>
-    </tr>
-    <tr>
-      <td>Съгласие за снимки и видео</td>
-      <td><?= $st['agree_photos'] ? '✅' : '—' ?></td>
-    </tr>
-    <tr>
-      <td>Декларация за коректност на данните</td>
-      <td><?= $st['declare_correct'] ? '✅' : '—' ?></td>
-    </tr>
-  </tbody>
-</table>
+  </div>
+<div class="card">
+  <h3>Декларации / отметки</h3>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Декларация</th>
+        <th>Статус</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Заявена тога</td>
+        <td><?= $st['gown_requested'] ? '✅' : '—' ?></td>
+      </tr>
+      <tr>
+        <td>Съгласие за обработка на лични данни</td>
+        <td><?= $st['agree_personal_data'] ? '✅' : '—' ?></td>
+      </tr>
+      <tr>
+        <td>Съгласие за публикуване на име в списъци</td>
+        <td><?= $st['agree_public_name'] ? '✅' : '—' ?></td>
+      </tr>
+      <tr>
+        <td>Съгласие за снимки и видео</td>
+        <td><?= $st['agree_photos'] ? '✅' : '—' ?></td>
+      </tr>
+      <tr>
+        <td>Декларация за коректност на данните</td>
+        <td><?= $st['declare_correct'] ? '✅' : '—' ?></td>
+      </tr>
+    </tbody>
+  </table>
+  <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
+</div>
 
 
-    <div class="small">
-      Тога заявена: <b><?= $st['gown_requested'] ? 'Да' : 'Не' ?></b> •
-      Взел тога: <b><?= $st['gown_taken'] ? 'Да' : 'Не' ?></b> •
-      Върнал тога: <b><?= $st['gown_returned'] ? 'Да' : 'Не' ?></b><br>
-      Отличник: <b><?= $st['is_honors'] ? 'Да' : 'Не' ?></b>
+    <div class="card">
+      Тога заявена: <b><?= $st['gown_requested'] ? 'Да ✅' : 'Не ❌' ?></b> <br>
+      Взел тога: <b><?= $st['gown_taken'] ? 'Да ✅' : 'Не ❌' ?></b> <br>
+      Върнал тога: <b><?= $st['gown_returned'] ? 'Да ✅' : 'Не ❌' ?></b><br>
+      Отличник: <b><?= $st['is_honors'] ? 'Да ✅' : 'Не ❌' ?></b>
+      <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
     </div>
 
     <hr style="border:none;border-top:1px solid #eee;margin:12px 0">
