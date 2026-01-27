@@ -57,6 +57,13 @@ $stmt->execute([$uid,$fn,$deg,$prog,$grp,$phone,$gpa]);
 
   // ensure grad_process
   $pdo->prepare("INSERT IGNORE INTO grad_process(student_id) VALUES(?)")->execute([$sid]);
+
+  $pdo->prepare("
+  UPDATE grad_process gp
+  JOIN students s ON s.id = gp.student_id
+  SET gp.is_honors = (s.gpa >= 5.50)
+  WHERE gp.student_id = ?
+")->execute([$sid]);
 }
 $pdo->commit();
 
