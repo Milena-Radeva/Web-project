@@ -4,9 +4,10 @@ require_once __DIR__.'/../inc/helpers.php';
 require_role(['student']);
 
 $u = current_user();
+$pdo = db();
 
-$stmt = db()->prepare("
-  SELECT s.id AS student_id, gp.guests_allowed
+$stmt = $pdo->prepare("
+  SELECT s.id AS student_id, gp.guests_allowed, gp.stage
   FROM students s
   JOIN grad_process gp ON gp.student_id=s.id
   WHERE s.user_id=?
@@ -16,20 +17,12 @@ $info = $stmt->fetch();
 if(!$info) exit('No student');
 
 $student_id = (int)$info['student_id'];
+$allowed    = (int)($info['guests_allowed'] ?? 2);
+$stage      = (int)($info['stage'] ?? 0);
 
-$st = db()->prepare("SELECT id, token, used_at FROM guest_tickets WHERE student_id=? ORDER BY id");
+$st = $pdo->prepare("SELECT id, token, used_at FROM guest_tickets WHERE student_id=? ORDER BY id");
 $st->execute([$student_id]);
 $tickets = $st->fetchAll();
-
-$stmt = db()->prepare("
-  SELECT gp.stage
-  FROM grad_process gp
-  JOIN students s ON s.id = gp.student_id
-  WHERE s.user_id = ?
-");
-$stmt->execute([$u['id']]);
-$gp = $stmt->fetch();
-
 
 $msg = $_GET['msg'] ?? '';
 ?>
@@ -46,42 +39,56 @@ $msg = $_GET['msg'] ?? '';
 </div>
 
 <div class="container">
+
+  <!-- ГОРНА КАРТА -->
   <div class="card">
-    <?php if($gp['stage'] < 1): ?>
-      <div class="card" style="background:#fff3cd;border-color:#ffe69c;color:#664d03">
+    <?php if($stage < 1): ?>
+      <div class="card" style="background:#fff3cd;border-color:#ffe69c;color:#664d03;margin:0;">
         Заявлението ти все още не е потвърдено от администрацията.
         След потвърждение ще можеш да генерираш билети за гости.
       </div>
     <?php else: ?>
-      <div class="small">Позволени билети: <b><?=h($info['guests_allowed'])?></b></div>
+
+      <div class="small">Позволени билети: <b><?=h($allowed)?></b></div>
 
       <?php if($msg==='ok'): ?>
-        <div class="badge stage-3">✅ Билетите са генерирани.</div>
+        <div class="badge stage-3" style="margin-top:10px;">✅ Билетът е генериран.</div>
       <?php elseif($msg==='limit'): ?>
-        <div class="badge stage-1">ℹ️ Достигнат е лимитът.</div>
+        <div class="badge stage-1" style="margin-top:10px;">ℹ️ Достигнат е лимитът.</div>
+      <?php elseif($msg==='not_confirmed'): ?>
+        <div class="badge stage-1">⛔ Заявлението не е потвърдено.</div>
       <?php endif; ?>
 
       <p style="margin-top:10px">
-        <a class="btn primary" href="/graduation/api/guest_tickets_generate.php">Генерирай билети</a>
+        <a class="btn primary" href="/graduation/api/guest_tickets_generate.php">Генерирай билет</a>
       </p>
 
       <div class="small">
         Покажи QR кода на входа. Всеки билет се използва само веднъж.
       </div>
-      </div>
-    <?php endif; ?>
 
-  <?php foreach($tickets as $t): ?>
+    <?php endif; ?>
+  </div>
+
+  <!-- СПИСЪК БИЛЕТИ -->
+  <?php if(empty($tickets)): ?>
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;">
-        <div>
-          <b>Билет #<?=h($t['id'])?></b><br>
-          <span class="small">Статус: <?= $t['used_at'] ? '✅ използван' : '— не е използван' ?></span>
-        </div>
-        <div class="qr" data-token="<?=h($t['token'])?>"></div>
-      </div>
+      <div class="small">Все още няма генерирани билети.</div>
     </div>
-  <?php endforeach; ?>
+  <?php else: ?>
+    <?php foreach($tickets as $i => $t): ?>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;">
+          <div>
+            <b>Билет #<?=h($i+1)?></b><br>
+            <span class="small">Статус: <?= $t['used_at'] ? '✅ използван' : '— не е използван' ?></span>
+          </div>
+          <div class="qr" data-token="<?=h($t['token'])?>"></div>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  <?php endif; ?>
+
 </div>
 
 <script>
@@ -91,4 +98,6 @@ document.querySelectorAll('.qr').forEach(el=>{
   new QRCode(el, { text: url, width: 110, height: 110 });
 });
 </script>
+
 </body></html>
+
