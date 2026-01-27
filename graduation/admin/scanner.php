@@ -11,8 +11,9 @@ require_role(['admin','superadmin']);
 
 <div class="topbar">
   <b>Скенер</b>
-  <span style="margin-left:auto"><?=h(current_user()['full_name'])?></span>
   <a class="btn" href="/graduation/admin/dashboard.php">Назад</a>
+  <span style="margin-left:auto"><?=h(current_user()['full_name'])?></span>
+  <a class="btn" href="/graduation/api/auth_logout.php">Изход</a>
 </div>
 
 <div class="container">

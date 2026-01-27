@@ -9,22 +9,6 @@ $s->execute([$u['id']]);
 $st = $s->fetch();
 
 if($_SERVER['REQUEST_METHOD']==='POST'){
-  /*$photoName = null;
-
-  if(isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK){
-    $ext = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
-    $photoName = 'student_'.$st['id'].'_'.time().'.'.$ext;
-    move_uploaded_file(
-      $_FILES['photo']['tmp_name'], 
-      __DIR__.'/../uploads/'.$photoName
-    );
-  
-
-    // записваме снимката в таблицата students
-    db()->prepare("UPDATE students SET photo=? WHERE id=?")
-       ->execute([$photoName, $st['id']]);
-  }*/
-
   $notes = $_POST['notes'] ?? '';
 $gown_requested      = isset($_POST['gown_requested']) ? 1 : 0;
 $agree_personal_data = isset($_POST['agree_personal_data']) ? 1 : 0;

@@ -21,6 +21,16 @@ $st = db()->prepare("SELECT id, token, used_at FROM guest_tickets WHERE student_
 $st->execute([$student_id]);
 $tickets = $st->fetchAll();
 
+$stmt = db()->prepare("
+  SELECT gp.stage
+  FROM grad_process gp
+  JOIN students s ON s.id = gp.student_id
+  WHERE s.user_id = ?
+");
+$stmt->execute([$u['id']]);
+$gp = $stmt->fetch();
+
+
 $msg = $_GET['msg'] ?? '';
 ?>
 <!doctype html><html lang="bg"><head>
@@ -37,22 +47,29 @@ $msg = $_GET['msg'] ?? '';
 
 <div class="container">
   <div class="card">
-    <div class="small">Позволени билети: <b><?=h($info['guests_allowed'])?></b></div>
+    <?php if($gp['stage'] < 1): ?>
+      <div class="card" style="background:#fff3cd;border-color:#ffe69c;color:#664d03">
+        Заявлението ти все още не е потвърдено от администрацията.
+        След потвърждение ще можеш да генерираш билети за гости.
+      </div>
+    <?php else: ?>
+      <div class="small">Позволени билети: <b><?=h($info['guests_allowed'])?></b></div>
 
-    <?php if($msg==='ok'): ?>
-      <div class="badge stage-3">✅ Билетите са генерирани.</div>
-    <?php elseif($msg==='limit'): ?>
-      <div class="badge stage-1">ℹ️ Достигнат е лимитът.</div>
+      <?php if($msg==='ok'): ?>
+        <div class="badge stage-3">✅ Билетите са генерирани.</div>
+      <?php elseif($msg==='limit'): ?>
+        <div class="badge stage-1">ℹ️ Достигнат е лимитът.</div>
+      <?php endif; ?>
+
+      <p style="margin-top:10px">
+        <a class="btn primary" href="/graduation/api/guest_tickets_generate.php">Генерирай билети</a>
+      </p>
+
+      <div class="small">
+        Покажи QR кода на входа. Всеки билет се използва само веднъж.
+      </div>
+      </div>
     <?php endif; ?>
-
-    <p style="margin-top:10px">
-      <a class="btn primary" href="/graduation/api/guest_tickets_generate.php">Генерирай билети</a>
-    </p>
-
-    <div class="small">
-      Покажи QR кода на входа. Всеки билет се използва само веднъж.
-    </div>
-  </div>
 
   <?php foreach($tickets as $t): ?>
     <div class="card">

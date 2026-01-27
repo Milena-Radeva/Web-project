@@ -29,14 +29,20 @@ while(($row = fgetcsv($fh)) !== false){
   // default pass = "student123" (можеш да го смениш)
  // паролата = факултетният номер
   $plainPass = $fn; 
-  $passHash = password_hash($plainPass, PASSWORD_BCRYPT);
+  $passHash = hash('sha256', $plainPass);
+
 
 
   // upsert user
-  $stmt = $pdo->prepare("INSERT INTO users(email,pass_hash,role,full_name)
-                         VALUES(?,?, 'student', ?)
-                         ON DUPLICATE KEY UPDATE full_name=VALUES(full_name)");
-  $stmt->execute([$email,$passHash,$full]);
+  $stmt = $pdo->prepare("
+  INSERT INTO users(email,pass_hash,role,full_name)
+  VALUES(?,?, 'student', ?)
+  ON DUPLICATE KEY UPDATE
+    full_name=VALUES(full_name),
+    pass_hash=VALUES(pass_hash)
+");
+$stmt->execute([$email,$passHash,$full]);
+
 
   $uid = (int)($pdo->lastInsertId() ?: $pdo->query("SELECT id FROM users WHERE email=".$pdo->quote($email))->fetchColumn());
 
@@ -50,21 +56,30 @@ while(($row = fgetcsv($fh)) !== false){
                                                gpa=VALUES(gpa)");
 $stmt->execute([$uid,$fn,$deg,$prog,$grp,$phone,$gpa]);
 
-  $sid = (int)($pdo->lastInsertId() ?: $pdo->query("SELECT id FROM students WHERE faculty_no=".$pdo->quote($fn))->fetchColumn());
+    $sid = (int)($pdo->lastInsertId() ?: $pdo->query("SELECT id FROM students WHERE faculty_no=".$pdo->quote($fn))->fetchColumn());
+
+  // 1) ensure grad_process (ВАЖНО: преди update)
+  $pdo->prepare("INSERT IGNORE INTO grad_process(student_id) VALUES(?)")->execute([$sid]);
+
+  // 2) honors автоматично по успех
   $isHonors = ($gpa !== null && $gpa >= 5.50) ? 1 : 0;
   $pdo->prepare("UPDATE grad_process SET is_honors=? WHERE student_id=?")->execute([$isHonors, $sid]);
 
-
-  // ensure grad_process
-  $pdo->prepare("INSERT IGNORE INTO grad_process(student_id) VALUES(?)")->execute([$sid]);
-
-  $pdo->prepare("
-  UPDATE grad_process gp
-  JOIN students s ON s.id = gp.student_id
-  SET gp.is_honors = (s.gpa >= 5.50)
-  WHERE gp.student_id = ?
-")->execute([$sid]);
 }
 $pdo->commit();
+$_SESSION['flash'] = [
+  'type' => 'success',
+  'msg'  => 'Импортът приключи успешно!'
+];
 
-header("Location: /graduation/admin/import_export.php?ok=1");
+header("Location: /graduation/admin/import_export.php");
+exit;
+
+$_SESSION['flash'] = [
+  'type' => 'error',
+  'msg'  => 'Възникна грешка при импорта!'
+];
+
+header("Location: /graduation/admin/import_export.php");
+exit;
+

@@ -33,7 +33,7 @@ if(!$qr){
 /* Данни за студента */
 $stmt = db()->prepare("
   SELECT s.*, gp.stage, gp.gown_requested, gp.gown_taken, gp.gown_returned, 
-         gp.is_honors, s.photo
+         gp.is_honors, s.photo,s.gpa
   FROM students s
   JOIN grad_process gp ON gp.student_id=s.id
   WHERE s.user_id=?
@@ -97,7 +97,8 @@ if(!$row){ exit('Няма студентски профил.'); }
           ФН: <b><?=h($row['faculty_no'])?></b><br>
           Степен: <b><?=h($row['degree'])?></b><br>
           Група: <b><?=h($row['group_code'])?></b><br>
-          Специалност: <b><?=h($row['program_name'])?></b>
+          Специалност: <b><?=h($row['program_name'])?></b><br>
+          Успех: <b><?=h($row['gpa'])?></b>
         </div>
 
         <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
@@ -123,6 +124,7 @@ if(!$row){ exit('Няма студентски профил.'); }
         </div>
       <?php endif; ?>
     </div>
+    <p> *Прикачването на снимка за дипломата в профила Ви  е задължително изискване за одобрението на вашето заявление от админа! </p>
 
     <!-- ДОЛУ: тоги/отличия -->
     <div style="grid-column:1/-1; border-top:1px solid #eee; padding-top:12px;">

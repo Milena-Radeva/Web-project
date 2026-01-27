@@ -15,19 +15,6 @@ if(isset($_GET['export'])){
   header('Content-Disposition: attachment; filename="'.$type.'.csv"');
   $out = fopen('php://output','w');
 
-  /*if($type==='students'){
-    fputcsv($out, ['faculty_no','full_name','email','degree','group_code','stage','gown_requested','gown_taken','gown_returned','is_honors']);
-    $rows = $pdo->query("
-      SELECT s.faculty_no, u.full_name, u.email, s.degree, s.group_code,
-             gp.stage, gp.gown_requested, gp.gown_taken, gp.gown_returned, gp.is_honors
-      FROM students s
-      JOIN users u ON u.id=s.user_id
-      JOIN grad_process gp ON gp.student_id=s.id
-      ORDER BY s.group_code, u.full_name
-    ")->fetchAll();
-    foreach($rows as $r) fputcsv($out, $r);
-    exit;
-  }*/
 
   if($type==='gpa'){
     fputcsv($out, ['faculty_no','full_name','degree','group_code','gpa','stage','is_honors']);
@@ -74,61 +61,6 @@ if(isset($_GET['export'])){
     foreach($rows as $r) fputcsv($out, $r);
     exit;
   }
-
-  // stats (общи метрики)
-  /*if($type==='stats'){
-    fputcsv($out, ['metric','value']);
-
-    $registered = (int)$pdo->query("SELECT COUNT(*) FROM grad_process")->fetchColumn();
-    $stage0 = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE stage=0")->fetchColumn();
-    $stage1 = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE stage=1")->fetchColumn();
-    $stage2 = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE stage=2")->fetchColumn();
-    $stage3 = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE stage=3")->fetchColumn();
-
-    $gownReq = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE gown_requested=1")->fetchColumn();
-    $gownTaken = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE gown_taken=1")->fetchColumn();
-    $gownReturned = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE gown_returned=1")->fetchColumn();
-
-    $honors = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE is_honors=1")->fetchColumn();
-
-    $missingPhoto = (int)$pdo->query("SELECT COUNT(*) FROM students WHERE photo IS NULL OR photo=''")->fetchColumn();
-
-    $totalTickets = (int)$pdo->query("SELECT COUNT(*) FROM guest_tickets")->fetchColumn();
-    $usedTickets  = (int)$pdo->query("SELECT COUNT(*) FROM guest_tickets WHERE used_at IS NOT NULL")->fetchColumn();
-
-    $decl = $pdo->query("
-      SELECT
-        SUM(agree_personal_data=1) AS agree_personal_data_yes,
-        SUM(agree_public_name=1)   AS agree_public_name_yes,
-        SUM(agree_photos=1)        AS agree_photos_yes,
-        SUM(declare_correct=1)     AS declare_correct_yes,
-        COUNT(*) AS total
-      FROM grad_process
-    ")->fetch();
-
-    $pairs = [
-      ['registered_total', $registered],
-      ['stage_0', $stage0],
-      ['stage_1', $stage1],
-      ['stage_2', $stage2],
-      ['stage_3', $stage3],
-      ['gown_requested', $gownReq],
-      ['gown_taken', $gownTaken],
-      ['gown_returned', $gownReturned],
-      ['honors', $honors],
-      ['missing_photo', $missingPhoto],
-      ['tickets_total', $totalTickets],
-      ['tickets_used', $usedTickets],
-      ['agree_personal_data_yes', (int)$decl['agree_personal_data_yes']],
-      ['agree_public_name_yes', (int)$decl['agree_public_name_yes']],
-      ['agree_photos_yes', (int)$decl['agree_photos_yes']],
-      ['declare_correct_yes', (int)$decl['declare_correct_yes']],
-      ['declarations_total_rows', (int)$decl['total']],
-    ];
-
-    foreach($pairs as $p) fputcsv($out, $p);
-    exit;
-  }*/
 
   // unknown export
   fputcsv($out, ['error','unknown export type']);
@@ -219,6 +151,7 @@ $incomplete = $pdo->query("
   <a class="btn" href="/graduation/admin/reports.php?export=gpa">Студенти, сортирани по успех</a>
   <a class="btn" href="/graduation/admin/reports.php?export=declarations">Статистика на попълнените декларации</a>
   <a class="btn" href="/graduation/admin/reports.php?export=tickets">Билети</a>
+  <a class="btn" style="margin-left:auto" href="/graduation/api/auth_logout.php">Изход</a>
   <!---<a class="btn primary" href="/graduation/admin/reports.php?export=stats">CSV: статистика</a>--->
 </div>
 
@@ -251,10 +184,9 @@ $incomplete = $pdo->query("
         <div class="small">Липсва снимка: <b><?=h($missingPhoto)?></b></div>
       </div>
       <div>
-        <b>Билети (гости)</b><br>
+        <b>Билети</b><br>
         <div class="small">Общо: <b><?=h($totalTickets)?></b></div>
         <div class="small">Използвани: <b><?=h($usedTickets)?></b></div>
-        <div class="small">Свободни: <b><?=h($totalTickets - $usedTickets)?></b></div>
       </div>
     </div>
   </div>
@@ -262,13 +194,13 @@ $incomplete = $pdo->query("
   <div class="card">
     <h3>Статистика: дадени съгласия</h3>
     <table class="table">
-      <thead><tr><th>Поле</th><th>Отбелязали</th><th>Общо</th></tr></thead>
+      <thead><tr><th>Декларации</th><th class='center'>Отбелязани</th><th class='center'>Общо</th></tr></thead>
       <tbody>
-        <tr><td>Тога заявена</td><td><?=h($declStats['gown_requested_yes'])?></td><td><?=h($declStats['total'])?></td></tr>
-        <tr><td>Съгласие лични данни (GDPR)</td><td><?=h($declStats['agree_personal_data_yes'])?></td><td><?=h($declStats['total'])?></td></tr>
-        <tr><td>Публикуване на име</td><td><?=h($declStats['agree_public_name_yes'])?></td><td><?=h($declStats['total'])?></td></tr>
-        <tr><td>Снимки/видео</td><td><?=h($declStats['agree_photos_yes'])?></td><td><?=h($declStats['total'])?></td></tr>
-        <tr><td>Декларация за вярност</td><td><?=h($declStats['declare_correct_yes'])?></td><td><?=h($declStats['total'])?></td></tr>
+        <tr><td>Тога заявена</td><td class="center"><?=h($declStats['gown_requested_yes'])?></td><td class="center"><?=h($declStats['total'])?></td></tr>
+        <tr><td>Съгласие лични данни (GDPR)</td><td class="center"><?=h($declStats['agree_personal_data_yes'])?></td><td class="center"><?=h($declStats['total'])?></td></tr>
+        <tr><td>Публикуване на име</td><td class="center"><?=h($declStats['agree_public_name_yes'])?></td><td class="center"><?=h($declStats['total'])?></td></tr>
+        <tr><td>Снимки/видео</td><td class="center"><?=h($declStats['agree_photos_yes'])?></td><td class="center"><?=h($declStats['total'])?></td></tr>
+        <tr><td>Декларация за вярност</td><td class="center"><?=h($declStats['declare_correct_yes'])?></td><td class="center"><?=h($declStats['total'])?></td></tr>
       </tbody>
     </table>
   </div>
@@ -279,13 +211,13 @@ $incomplete = $pdo->query("
       <div class="small">Няма.</div>
     <?php else: ?>
       <table class="table">
-        <thead><tr><th>ФН</th><th>Име</th><th>Група</th></tr></thead>
+        <thead><tr><th>ФН</th><th class="center">Име</th><th class="center">Група</th></tr></thead>
         <tbody>
           <?php foreach($incomplete as $r): ?>
             <tr>
               <td><?=h($r['faculty_no'])?></td>
-              <td><?=h($r['full_name'])?></td>
-              <td><?=h($r['group_code'])?></td>
+              <td class="center"><?=h($r['full_name'])?></td>
+              <td class="center"><?=h($r['group_code'])?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
@@ -299,19 +231,19 @@ $incomplete = $pdo->query("
     <table class="table">
       <thead>
         <tr>
-          <th>ФН</th><th>Име</th><th>Степен</th><th>Група</th><th>Успех</th><th>Етап</th><th>Отличник</th>
+          <th>ФН</th><th class="center">Име</th><th class="center">Степен</th><th class="center">Група</th><th class="center">Успех</th><th class="center">Етап</th><th class="center">Отличник</th>
         </tr>
       </thead>
       <tbody>
       <?php foreach($byGpa as $r): ?>
         <tr>
-          <td><?=h($r['faculty_no'])?></td>
-          <td><?=h($r['full_name'])?></td>
-          <td><?=h($r['degree'])?></td>
-          <td><?=h($r['group_code'])?></td>
-          <td><b><?=h($r['gpa'] ?? '—')?></b></td>
-          <td><?=h(stage_label((int)$r['stage']))?></td>
-          <td><?= $r['is_honors'] ? '✅' : '—' ?></td>
+          <td class="center"><?=h($r['faculty_no'])?></td>
+          <td class="center"><?=h($r['full_name'])?></td>
+          <td class="center"><?=h($r['degree'])?></td>
+          <td class="center"><?=h($r['group_code'])?></td>
+          <td class="center"><b><?=h($r['gpa'] ?? '❌')?></b></td>
+          <td class="center"><?=h(stage_label((int)$r['stage']))?></td>
+          <td class="center"><?= $r['is_honors'] ? '✅' : '❌' ?></td>
         </tr>
       <?php endforeach; ?>
       </tbody>

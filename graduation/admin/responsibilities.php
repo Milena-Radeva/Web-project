@@ -22,7 +22,11 @@ $rows = $pdo->query("SELECT * FROM responsibilities ORDER BY type, active DESC, 
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="/graduation/assets/styles.css">
 <title>Отговорници</title></head><body>
-<div class="topbar"><b>Отговорници</b><a class="btn" href="/graduation/admin/dashboard.php">Назад</a></div>
+<div class="topbar">
+  <b>Отговорници</b>
+  <a class="btn" href="/graduation/admin/dashboard.php">Назад</a>
+  <a class="btn" style="margin-left:auto" href="/graduation/api/auth_logout.php">Изход</a>
+</div>
 <div class="container">
   <div class="card">
     <h3>Добави</h3>
@@ -44,34 +48,23 @@ $rows = $pdo->query("SELECT * FROM responsibilities ORDER BY type, active DESC, 
   <div class="card">
     <h3>Списък</h3>
     <table class="table">
-      <thead><tr><th>Тип</th><th>Име</th><th>Email</th><th>Телефон</th><th>Статус</th><th>Действие</th></tr></thead>
+      <thead><tr><th>Тип</th><th class='center'>Име</th><th class='center'>Email</th><th class='center'>Телефон</th><th class='center'>Действие</th></tr></thead>
       <tbody>
         <?php foreach($rows as $r): ?>
           <tr>
             <td><?=h($r['type'])?></td>
-            <td><?=h($r['person_name'])?></td>
-            <td><?=h($r['email'] ?? '')?></td>
-            <td><?=h($r['phone'] ?? '')?></td>
-            <td>
-              <?= $r['active'] ? '<span style="color:green">Активен</span>' : '<span style="color:#999">Отписан</span>' ?>
-            </td>
-
-            <td>
-              <form method="post" action="/graduation/api/toggle_responsibility.php">
-                <input type="hidden" name="id" value="<?=h($r['id'])?>">
-                <?php if($r['active']): ?>
-                  <button class="btn" style="background:#fee;border-color:#f99"
-                    onclick="return confirm('Сигурен ли си, че искаш да отпишеш този отговорник?')">
-                    Отпиши
-                  </button>
-                <?php else: ?>
-                  <button class="btn" style="background:#e6fffa;border-color:#6ee7b7">
-                    Възстанови
-                  </button>
-                <?php endif; ?>
+            <td class='center'><?=h($r['person_name'])?></td>
+            <td class='center'><?=h($r['email'] ?? '')?></td>
+            <td class='center'><?=h($r['phone'] ?? '')?></td>
+            <td class='center'>
+            <form method="post" action="/graduation/api/delete_responsible.php"
+                  onsubmit="return confirm('Сигурна ли си, че искаш да изтриеш този отговорник?');">
+              <input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+              <button class="btn" style="background:#fee;border-color:#f99">
+                Отпиши
+              </button>
               </form>
             </td>
-
           </tr>
         <?php endforeach; ?>
       </tbody>

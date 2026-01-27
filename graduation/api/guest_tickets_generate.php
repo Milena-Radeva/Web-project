@@ -6,7 +6,7 @@ $u = current_user();
 
 // student_id + guests_allowed
 $stmt = db()->prepare("
-  SELECT s.id AS student_id, gp.guests_allowed
+  SELECT s.id AS student_id, gp.guests_allowed, gp.stage
   FROM students s
   JOIN grad_process gp ON gp.student_id=s.id
   WHERE s.user_id=?
@@ -14,6 +14,10 @@ $stmt = db()->prepare("
 $stmt->execute([$u['id']]);
 $info = $stmt->fetch();
 if(!$info) exit('No student');
+if(!$st || $st['stage'] < 1){
+  http_response_code(403);
+  exit('Заявлението не е потвърдено.');
+}
 
 $student_id = (int)$info['student_id'];
 $allowed = (int)$info['guests_allowed'];
