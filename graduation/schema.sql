@@ -14,7 +14,7 @@ CREATE TABLE students (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL UNIQUE,
   faculty_no VARCHAR(50) NOT NULL UNIQUE,
-  degree ENUM('bachelor','master','phd') NOT NULL,
+  degree ENUM('Бакалавър','Магистър','Доктор') NOT NULL,
   program_name VARCHAR(190) NOT NULL,
   group_code VARCHAR(50) NOT NULL,  
   phone VARCHAR(50) NULL,
