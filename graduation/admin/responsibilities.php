@@ -7,7 +7,14 @@ $pdo = db();
 if($_SERVER['REQUEST_METHOD']==='POST'){
   $type = $_POST['type'] ?? 'gowns';
   $name = $_POST['person_name'] ?? '';
-  $email= $_POST['email'] ?? '';
+  $email = trim($_POST['email'] ?? '');
+
+  if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $_SESSION['flash'] = ['type'=>'error', 'msg'=>'Невалиден email адрес. Пример: name@domain.com'];
+    header("Location: /graduation/admin/responsibilities.php");
+    exit;
+  }
+
   $phone = trim($_POST['phone'] ?? '');
   $phoneNorm = preg_replace('/[^\d+]/', '', $phone);
 
@@ -48,7 +55,7 @@ $rows = $pdo->query("SELECT * FROM responsibilities ORDER BY type, active DESC, 
         </select>
       </div>
       <div><label>Име</label><input name="person_name" required></div>
-      <div><label>Email</label><input name="email"></div>
+      <div><label>Email</label><input type="email" name="email" placeholder="name@domain.com" required></div>
       <div><label>Телефон</label><input
                                         name="phone"
                                         inputmode="tel"
