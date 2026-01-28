@@ -41,11 +41,8 @@ function parseQr(decodedText){
   try{
     const u = new URL(decodedText);
     const token = u.searchParams.get('token');
-
-    // разпознаваме типа по пътя
     if(u.pathname.includes('/api/student_checkin.php')) return {type:'student', token};
     if(u.pathname.includes('/api/guest_checkin.php')) return {type:'guest', token};
-
     return {type:'unknown', token};
   }catch(e){
     return {type:'unknown', token:null};
@@ -63,15 +60,12 @@ async function processQr(decodedText){
   if(info.type === 'student') endpoint = '/graduation/api/student_checkin.php';
   else if(info.type === 'guest') endpoint = '/graduation/api/guest_checkin.php';
   else {
-    // fallback: пробваме като гост, ако не стане -> пробваме студент
     endpoint = '/graduation/api/guest_checkin.php';
   }
 
   resultBox.textContent = 'Проверка…';
   let res = await fetch(endpoint + '?token=' + encodeURIComponent(info.token));
   let text = await res.text();
-
-  // ако е unknown и guest не става, пробваме student
   if(info.type === 'unknown' && (text.includes('Невалиден билет') || res.status === 404)){
     res = await fetch('/graduation/api/student_checkin.php?token=' + encodeURIComponent(info.token));
     text = await res.text();

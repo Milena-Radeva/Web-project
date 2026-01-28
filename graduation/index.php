@@ -17,7 +17,7 @@ require_once __DIR__.'/inc/db.php';
     <div class="small">Тест акаунт: admin@uni.test / admin123</div>
     <form method="post" action="/graduation/api/auth_login.php">
       <div class="row">
-        <div><label>Email</label><input name="email" required></div>
+        <div><label>Email/Username</label><input name="email" required></div>
         <div><label>Парола</label><input type="password" name="pass" required></div>
       </div>
       <p><button class="btn primary">Вход</button></p>

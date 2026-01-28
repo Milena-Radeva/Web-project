@@ -10,7 +10,7 @@ if(!$fh) exit('Cannot open');
 $pdo = db();
 $pdo->beginTransaction();
 
-$header = fgetcsv($fh); // first row header
+$header = fgetcsv($fh); 
 while(($row = fgetcsv($fh)) !== false){
   $data = array_combine($header, $row);
 
@@ -25,15 +25,8 @@ while(($row = fgetcsv($fh)) !== false){
 
 
   if(!$email || !$full || !$fn) continue;
-
-  // default pass = "student123" (можеш да го смениш)
- // паролата = факултетният номер
   $plainPass = $fn; 
   $passHash = hash('sha256', $plainPass);
-
-
-
-  // upsert user
   $stmt = $pdo->prepare("
   INSERT INTO users(email,pass_hash,role,full_name)
   VALUES(?,?, 'student', ?)
@@ -45,8 +38,6 @@ $stmt->execute([$email,$passHash,$full]);
 
 
   $uid = (int)($pdo->lastInsertId() ?: $pdo->query("SELECT id FROM users WHERE email=".$pdo->quote($email))->fetchColumn());
-
-  // upsert student
   $stmt = $pdo->prepare("INSERT INTO students(user_id,faculty_no,degree,program_name,group_code,phone,gpa)
                        VALUES(?,?,?,?,?,?,?)
                        ON DUPLICATE KEY UPDATE degree=VALUES(degree),
@@ -57,11 +48,7 @@ $stmt->execute([$email,$passHash,$full]);
 $stmt->execute([$uid,$fn,$deg,$prog,$grp,$phone,$gpa]);
 
     $sid = (int)($pdo->lastInsertId() ?: $pdo->query("SELECT id FROM students WHERE faculty_no=".$pdo->quote($fn))->fetchColumn());
-
-  // 1) ensure grad_process (ВАЖНО: преди update)
   $pdo->prepare("INSERT IGNORE INTO grad_process(student_id) VALUES(?)")->execute([$sid]);
-
-  // 2) honors автоматично по успех
   $isHonors = ($gpa !== null && $gpa >= 5.50) ? 1 : 0;
   $pdo->prepare("UPDATE grad_process SET is_honors=? WHERE student_id=?")->execute([$isHonors, $sid]);
 

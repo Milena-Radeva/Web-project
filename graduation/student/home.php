@@ -5,32 +5,22 @@ require_role(['student']);
 
 $u = current_user();
 
-/* Взимаме студентския QR */
-$u = current_user();
-
-/* Взимаме student_id */
 $stmt = db()->prepare("SELECT id FROM students WHERE user_id=?");
 $stmt->execute([$u['id']]);
 $student_id = (int)$stmt->fetchColumn();
 
-/* Проверяваме дали вече има QR */
 $q = db()->prepare("SELECT id, token, used_at FROM student_qr WHERE student_id=?");
 $q->execute([$student_id]);
 $qr = $q->fetch();
 
-/* Ако няма → създаваме автоматично */
 if(!$qr){
   $token = bin2hex(random_bytes(16));
   db()->prepare("INSERT INTO student_qr(student_id, token) VALUES(?,?)")
     ->execute([$student_id, $token]);
-
-  // презареждаме току-що създадения QR
   $q->execute([$student_id]);
   $qr = $q->fetch();
 }
 
-
-/* Данни за студента */
 $stmt = db()->prepare("
   SELECT s.*, gp.stage, gp.gown_requested, gp.gown_taken, gp.gown_returned, 
          gp.is_honors, s.photo,s.gpa
@@ -62,10 +52,7 @@ if(!$row){ exit('Няма студентски профил.'); }
 <div class="container">
 
   <div class="card" style="display:grid; grid-template-columns: 1.2fr 0.8fr; gap:16px; align-items:start;">
-
-    <!-- ЛЯВО: профил -->
     <div style="display:flex; gap:16px; align-items:flex-start;">
-      <!-- Снимка -->
       <div style="width:120px; text-align:center;">
         <?php if(!empty($row['photo'])): ?>
           <img src="/graduation/uploads/<?=h($row['photo'])?>"
@@ -85,7 +72,6 @@ if(!$row){ exit('Няма студентски профил.'); }
         </div>
       </div>
 
-      <!-- Инфо -->
       <div style="flex:1;">
         <h2 style="margin:0 0 6px 0;"><?=h($u['full_name'])?></h2>
 
@@ -108,7 +94,6 @@ if(!$row){ exit('Няма студентски профил.'); }
       </div>
     </div>
 
-    <!-- ДЯСНО: QR -->
     <div style="border:1px solid #eee; border-radius:12px; padding:12px;">
       <div style="font-weight:700; margin-bottom:8px;">Входен QR</div>
 
@@ -124,10 +109,13 @@ if(!$row){ exit('Няма студентски профил.'); }
         </div>
       <?php endif; ?>
     </div>
-    <p> *Прикачването на снимка за дипломата в профила Ви  е задължително изискване за одобрението на вашето заявление от админа! </p>
 
-    <!-- ДОЛУ: тоги/отличия -->
-    <div style="grid-column:1/-1; border-top:1px solid #eee; padding-top:12px;">
+    
+      <p style="grid-column:1/-1; margin:10px 0 0 0;" class="small">
+  *Прикачването на снимка за дипломата в профила Ви е задължително изискване за одобрението на вашето заявление от админа!
+</p>
+<div style="grid-column:1/-1; border-top:1px solid #eee; padding-top:12px;">
+
       <div style="font-weight:700; margin-bottom:8px;">Тоги и отличия</div>
 
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -140,8 +128,6 @@ if(!$row){ exit('Няма студентски профил.'); }
 
   </div>
 </div>
-
-<script src="/graduation/assets/qrcode.min.js"></script>
 <script>
 <?php if(!empty($qr)): ?>
   new QRCode(document.getElementById("studentQr"), {

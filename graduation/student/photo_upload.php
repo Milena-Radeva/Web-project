@@ -25,7 +25,6 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     if(!in_array($ext, $allowed, true)){
       $err = 'Позволени са само JPG/PNG.';
     } else {
-      // ограничение размер (примерно 3MB)
       if($_FILES['photo']['size'] > 3*1024*1024){
         $err = 'Файлът е твърде голям (макс 3MB).';
       } else {
@@ -39,7 +38,6 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
         if(!move_uploaded_file($_FILES['photo']['tmp_name'], $dest)){
           $err = 'Неуспешно записване на файла.';
         } else {
-          // запис в DB
           db()->prepare("UPDATE students SET photo=? WHERE id=?")
             ->execute([$photoName, $s['id']]);
 

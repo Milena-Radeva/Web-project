@@ -6,7 +6,6 @@ require_role(['superadmin']); // само superadmin
 $pdo = db();
 $u = current_user();
 
-// Зареждаме всички админи + superadmin-и (без студентите)
 $admins = $pdo->query("
   SELECT id, email, full_name, role, created_at
   FROM users

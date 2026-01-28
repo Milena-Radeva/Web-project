@@ -136,9 +136,6 @@ $rows = db()->query("
               <button class="btn primary" name="action" value="finish">Завърши</button>
             </form>
           <?php endif; ?>
-
-          <!-- Отличник (еднопосочно) -->
-          <!-- Изтриване само ако е завършил -->
           <?php if((int)$r['stage'] === 3): ?>
             <form method="post" action="/graduation/api/delete_student.php" style="margin:0"
                   onsubmit="return confirm('Сигурна ли си, че искаш да изтриеш този студент? Това действие е необратимо.');">

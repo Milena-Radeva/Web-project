@@ -5,9 +5,6 @@ require_role(['admin','superadmin']);
 
 $pdo = db();
 
-/* =========================
-   EXPORTS (CSV)
-========================= */
 if(isset($_GET['export'])){
   $type = $_GET['export'];
 
@@ -61,17 +58,10 @@ if(isset($_GET['export'])){
     foreach($rows as $r) fputcsv($out, $r);
     exit;
   }
-
-  // unknown export
   fputcsv($out, ['error','unknown export type']);
   exit;
 }
 
-/* =========================
-   DATA FOR PAGE (HTML)
-========================= */
-
-// Студенти по успех
 $byGpa = $pdo->query("
   SELECT
     s.id AS student_id,
@@ -88,7 +78,6 @@ $byGpa = $pdo->query("
   ORDER BY s.gpa DESC, u.full_name
 ")->fetchAll();
 
-// Декларации (обща статистика)
 $declStats = $pdo->query("
   SELECT
     SUM(gown_requested=1)        AS gown_requested_yes,
@@ -100,7 +89,6 @@ $declStats = $pdo->query("
   FROM grad_process
 ")->fetch();
 
-// Етапи
 $stageStats = [
   0 => (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE stage=0")->fetchColumn(),
   1 => (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE stage=1")->fetchColumn(),
@@ -108,19 +96,15 @@ $stageStats = [
   3 => (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE stage=3")->fetchColumn(),
 ];
 
-// Тоги
 $gownReq = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE gown_requested=1")->fetchColumn();
 $gownTaken = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE gown_taken=1")->fetchColumn();
 $gownReturned = (int)$pdo->query("SELECT COUNT(*) FROM grad_process WHERE gown_returned=1")->fetchColumn();
 
-// Снимки
 $missingPhoto = (int)$pdo->query("SELECT COUNT(*) FROM students WHERE photo IS NULL OR photo=''")->fetchColumn();
 
-// Билети
 $totalTickets = (int)$pdo->query("SELECT COUNT(*) FROM guest_tickets")->fetchColumn();
 $usedTickets  = (int)$pdo->query("SELECT COUNT(*) FROM guest_tickets WHERE used_at IS NOT NULL")->fetchColumn();
 
-// Непълни заявления (липсва required)
 $incomplete = $pdo->query("
   SELECT s.faculty_no, u.full_name, s.group_code
   FROM students s
@@ -147,12 +131,10 @@ $incomplete = $pdo->query("
 
   <span style="margin-left:auto"></span>
   <label> Изтегли готовите таблици от тук: </label>
-  <!---<a class="btn" href="/graduation/admin/reports.php?export=students">CSV: студенти</a>--->
   <a class="btn" href="/graduation/admin/reports.php?export=gpa">Студенти, сортирани по успех</a>
   <a class="btn" href="/graduation/admin/reports.php?export=declarations">Статистика на попълнените декларации</a>
   <a class="btn" href="/graduation/admin/reports.php?export=tickets">Билети</a>
   <a class="btn" style="margin-left:auto" href="/graduation/api/auth_logout.php">Изход</a>
-  <!---<a class="btn primary" href="/graduation/admin/reports.php?export=stats">CSV: статистика</a>--->
 </div>
 
 <div class="container">

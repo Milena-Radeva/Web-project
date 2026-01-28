@@ -17,13 +17,11 @@ if ($action === 'create_admin') {
     exit;
   }
 
-  // минимална валидация
   if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     header("Location: /graduation/admin/admins.php?err=Невалиден+email");
     exit;
   }
 
-  // ако email вече съществува -> грешка
   $exists = $pdo->prepare("SELECT id FROM users WHERE email=?");
   $exists->execute([$email]);
   if ($exists->fetchColumn()) {
@@ -54,7 +52,6 @@ if ($action === 'delete_admin') {
     exit;
   }
 
-  // не трием superadmin
   $role = $pdo->prepare("SELECT role FROM users WHERE id=?");
   $role->execute([$userId]);
   $r = $role->fetchColumn();
@@ -69,7 +66,6 @@ if ($action === 'delete_admin') {
     exit;
   }
 
-  // safety: да няма student профил вързан (по принцип няма)
   $hasStudent = $pdo->prepare("SELECT id FROM students WHERE user_id=?");
   $hasStudent->execute([$userId]);
   if ($hasStudent->fetchColumn()) {

@@ -6,7 +6,6 @@ require_role(['admin','superadmin']);
 $id = (int)($_GET['id'] ?? 0);
 if(!$id) { exit('Missing id'); }
 
-// Данни за студента + процес
 $stmt = db()->prepare("
   SELECT
     s.id AS student_id,
@@ -45,7 +44,6 @@ if(!$st) { exit('Student not found'); }
 
 <div class="container">
   <div class="card" style="display:flex; gap:20px; align-items:center;">
-    <!-- Снимка -->
     <div style="flex:0 0 140px; text-align:center;">
       <?php if(!empty($st['photo'])): ?>
         <img src="/graduation/uploads/<?=h($st['photo'])?>"
@@ -62,7 +60,6 @@ if(!$st) { exit('Student not found'); }
       <?php endif; ?>
     </div>
 
-    <!-- Информация -->
     <div style="flex:1;">
       <h2 style="margin:0 0 6px 0;"><?=h($st['full_name'])?></h2>
 

@@ -39,8 +39,6 @@ $msg = $_GET['msg'] ?? '';
 </div>
 
 <div class="container">
-
-  <!-- ГОРНА КАРТА -->
   <div class="card">
     <?php if($stage < 1): ?>
       <div class="card" style="background:#fff3cd;border-color:#ffe69c;color:#664d03;margin:0;">
@@ -70,7 +68,6 @@ $msg = $_GET['msg'] ?? '';
     <?php endif; ?>
   </div>
 
-  <!-- СПИСЪК БИЛЕТИ -->
   <?php if(empty($tickets)): ?>
     <div class="card">
       <div class="small">Все още няма генерирани билети.</div>

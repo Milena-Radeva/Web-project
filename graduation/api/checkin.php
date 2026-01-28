@@ -15,10 +15,8 @@ if($t['used_at']){
   exit;
 }
 
-// mark token used
 $pdo->prepare("UPDATE qr_tokens SET used_at=NOW() WHERE id=?")->execute([$t['id']]);
 
-// apply action to grad_process
 switch($t['purpose']){
   case 'checkin':
     $pdo->prepare("UPDATE grad_process SET ceremony_checked_in_at=NOW(), stage=GREATEST(stage,2) WHERE student_id=?")->execute([$t['student_id']]);

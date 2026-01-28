@@ -1,7 +1,6 @@
 CREATE DATABASE IF NOT EXISTS graduation_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE graduation_db;
 
--- USERS (roles: student/admin/superadmin)
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(190) NOT NULL UNIQUE,
@@ -11,20 +10,17 @@ CREATE TABLE users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- STUDENTS (като профил/академични данни)
 CREATE TABLE students (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL UNIQUE,
   faculty_no VARCHAR(50) NOT NULL UNIQUE,
   degree ENUM('bachelor','master','phd') NOT NULL,
   program_name VARCHAR(190) NOT NULL,
-  group_code VARCHAR(50) NOT NULL,   -- напр. "БАК-2026-1"
+  group_code VARCHAR(50) NOT NULL,  
   phone VARCHAR(50) NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- GRADUATION PROCESS (етапи + тоги + церемония + отличия)
--- stage: 0=Регистриран, 1=Потвърден, 2=На церемония, 3=Завършен
 CREATE TABLE grad_process (
   id INT AUTO_INCREMENT PRIMARY KEY,
   student_id INT NOT NULL UNIQUE,
@@ -43,7 +39,6 @@ CREATE TABLE grad_process (
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
 
--- RESPONSIBILITIES (отговорници: тоги/подписи/дипломи)
 CREATE TABLE responsibilities (
   id INT AUTO_INCREMENT PRIMARY KEY,
   type ENUM('gowns','signatures','diplomas') NOT NULL,
@@ -53,8 +48,6 @@ CREATE TABLE responsibilities (
   active TINYINT NOT NULL DEFAULT 1
 );
 
-
--- QR tokens for checklists (simple)
 CREATE TABLE qr_tokens (
   id INT AUTO_INCREMENT PRIMARY KEY,
   student_id INT NOT NULL,
@@ -65,11 +58,9 @@ CREATE TABLE qr_tokens (
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
 
--- Seed accounts (пароли: admin123 / student123)
 INSERT INTO users(email, pass_hash, role, full_name) VALUES
 ('admin@uni.test',  SHA2('admin123', 256), 'superadmin', 'System Admin');
 
--- Seed responsibilities
 INSERT INTO responsibilities(type, person_name, email, phone) VALUES
 ('gowns','Мария Георгиева','gowns@uni.test','0888000001'),
 ('signatures','Доц. Петров','sign@uni.test','0888000002'),
@@ -86,7 +77,6 @@ CREATE TABLE IF NOT EXISTS guest_tickets (
   FOREIGN KEY (used_by_user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- лимит билети на студент (по подразбиране 2)
 ALTER TABLE grad_process
   ADD COLUMN guests_allowed INT NOT NULL DEFAULT 2;
 
@@ -115,5 +105,10 @@ ALTER TABLE students ADD COLUMN photo VARCHAR(255) NULL;
 UPDATE grad_process gp
 JOIN students s ON s.id = gp.student_id
 SET gp.is_honors = (s.gpa >= 5.50);
+
+ALTER TABLE grad_process 
+ADD COLUMN application_submitted TINYINT(1) DEFAULT 0,
+ADD COLUMN application_submitted_at DATETIME NULL;
+
 
 
