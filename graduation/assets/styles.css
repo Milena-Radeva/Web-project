@@ -5,16 +5,15 @@
   --text:#1e1b16;
   --muted:#6f6a61;
 
-  --accent:#6b8f71;   /* маслено зелено */
-  --accent-2:#7a1f3d; /* бордо */
-  --accent-3:#b08968; /* бежово-златисто */
-  --accent-4:#c08497; /* dusty rose */
+  --accent:#6b8f71;   
+  --accent-2:#7a1f3d;
+  --accent-3:#b08968; 
+  --accent-4:#c08497; 
 
   --radius:18px;
   font-family:system-ui,Segoe UI,Arial;
 }
 
-/* Base */
 body{
   margin:0;
   background:
@@ -24,7 +23,6 @@ body{
   color:var(--text);
 }
 
-/* Top bar */
 .topbar{
   display:flex;
   gap:14px;
@@ -35,14 +33,12 @@ body{
   box-shadow:0 4px 18px rgba(0,0,0,.06);
 }
 
-/* Layout */
 .container{
   max-width:1200px;
   margin:26px auto;
   padding:0 18px;
 }
 
-/* Cards */
 .card{
   background:linear-gradient(180deg,#ffffff,#fbfaf8);
   border:1px solid var(--border);
@@ -54,14 +50,7 @@ body{
     0 30px 70px rgba(0,0,0,.05);
   transition:all .2s ease;
 }
-.card:hover{
-  transform:translateY(-4px);
-  box-shadow:
-    0 10px 26px rgba(0,0,0,.08),
-    0 40px 90px rgba(107,143,113,.15);
-}
 
-/* Tables */
 .table{
   width:100%;
   border-collapse:separate;
@@ -86,7 +75,6 @@ body{
   background:linear-gradient(90deg,#f4f2ee,transparent);
 }
 
-/* Badges */
 .badge{
   display:inline-flex;
   align-items:center;
@@ -98,7 +86,6 @@ body{
   border:1px solid transparent;
 }
 
-/* Stage badges */
 .stage-0{
   background:linear-gradient(135deg,#e6efe9,#d4e3da);
   color:#2f4f3a;
@@ -120,7 +107,6 @@ body{
   border-color:#b7d0c2;
 }
 
-/* Confirmed badge – зелено */
 .badge.confirmed,
 .badge.stage-3{
   background:linear-gradient(135deg,#dcfce7,#bbf7d0) !important;
@@ -129,13 +115,11 @@ body{
   box-shadow:0 0 0 3px rgba(34,197,94,.18);
 }
 
-/* Text helpers */
 .small{
   font-size:16px;
   color:var(--muted);
 }
 
-/* Buttons */
 .btn{
   display:inline-flex;
   align-items:center;
@@ -164,7 +148,6 @@ body{
   filter:brightness(1.06);
 }
 
-/* Inputs – фиксиране на застъпване */
 input:not([type="checkbox"]),
 select,
 textarea{
@@ -185,21 +168,18 @@ textarea:focus{
   box-shadow:0 0 0 4px rgba(107,143,113,.25);
 }
 
-/* Grid */
 .row{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:16px;
 }
 
-/* Responsive fix за застъпване на полета */
 @media (max-width:720px){
   .row{
     grid-template-columns:1fr;
   }
 }
 
-/* Checkbox */
 input[type="checkbox"]{
   width:auto;
   accent-color:var(--accent);
