@@ -31,7 +31,7 @@ if ($action === 'create_admin') {
     exit;
   }
 
-  $hash = password_hash($pass, PASSWORD_BCRYPT);
+  $hash = hash('sha256', $pass);
 
   $pdo->prepare("
     INSERT INTO users(email, pass_hash, role, full_name)
