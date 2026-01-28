@@ -64,7 +64,7 @@ $rows = $pdo->query("SELECT * FROM responsibilities ORDER BY type, active DESC, 
                                         title="Пример: 0888123456 или +359888123456"
                                       >
 
-      <div style="grid-column:1/-1"><button class="btn primary">Запази</button></div>
+      <div style="grid-column:1/-1"><button class="btn primary" style="margin-top:16px;">Запази</button></div>
     </form>
   </div>
 
