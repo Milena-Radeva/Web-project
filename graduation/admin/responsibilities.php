@@ -8,7 +8,16 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
   $type = $_POST['type'] ?? 'gowns';
   $name = $_POST['person_name'] ?? '';
   $email= $_POST['email'] ?? '';
-  $phone= $_POST['phone'] ?? '';
+  $phone = trim($_POST['phone'] ?? '');
+  $phoneNorm = preg_replace('/[^\d+]/', '', $phone);
+
+  if ($phoneNorm !== '' && !preg_match('/^(\+?359|0)8\d{8}$/', $phoneNorm)) {
+    $_SESSION['flash'] = ['type'=>'error', 'msg'=>'Невалиден телефон. Пример: 0888123456 или +359888123456'];
+    header("Location: /graduation/admin/responsibilities.php");
+    exit;
+  }
+  $phone = $phoneNorm;
+
   if($name){
     $pdo->prepare("INSERT INTO responsibilities(type,person_name,email,phone) VALUES(?,?,?,?)")
         ->execute([$type,$name,$email,$phone]);
@@ -40,7 +49,14 @@ $rows = $pdo->query("SELECT * FROM responsibilities ORDER BY type, active DESC, 
       </div>
       <div><label>Име</label><input name="person_name" required></div>
       <div><label>Email</label><input name="email"></div>
-      <div><label>Телефон</label><input name="phone"></div>
+      <div><label>Телефон</label><input
+                                        name="phone"
+                                        inputmode="tel"
+                                        placeholder="08xx xxx xxx или +359..."
+                                         pattern="^(\+359|0)8[7-9]\d{7}$"
+                                        title="Пример: 0888123456 или +359888123456"
+                                      >
+
       <div style="grid-column:1/-1"><button class="btn primary">Запази</button></div>
     </form>
   </div>
