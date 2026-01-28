@@ -61,10 +61,6 @@ CREATE TABLE qr_tokens (
 INSERT INTO users(email, pass_hash, role, full_name) VALUES
 ('admin@uni.test',  SHA2('admin123', 256), 'superadmin', 'System Admin');
 
-INSERT INTO responsibilities(type, person_name, email, phone) VALUES
-('gowns','Мария Георгиева','gowns@uni.test','0888000001'),
-('signatures','Доц. Петров','sign@uni.test','0888000002'),
-('diplomas','Гл. специалист Димитрова','diplomas@uni.test','0888000003');
 
 CREATE TABLE IF NOT EXISTS guest_tickets (
   id INT AUTO_INCREMENT PRIMARY KEY,
